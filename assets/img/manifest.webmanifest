@@ -1,0 +1,11 @@
+{
+  "name": "Dimitris Pantazatos",
+  "short_name": "Pantazatos",
+  "icons": [
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png" }
+  ],
+  "theme_color": "#141726",
+  "background_color": "#141726",
+  "display": "standalone",
+  "start_url": "/"
+}
