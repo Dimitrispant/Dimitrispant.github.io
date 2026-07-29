@@ -1,0 +1,1569 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Dimitris Pantazatos — AI &amp; Data Solutions Leader</title>
+<meta name="author" content="Dimitris Pantazatos">
+<meta name="description" content="Dimitris Pantazatos is an AI and data solutions leader in Athens, with ten years across applied AI, data architecture and digital platforms. Experience, projects, publications and CV.">
+<meta name="theme-color" content="#141726">
+<meta property="og:type" content="profile">
+<meta property="og:title" content="Dimitris Pantazatos — AI &amp; Data Solutions Leader">
+<meta property="og:description" content="Applied AI, data architecture, and a floor plan you can walk around.">
+<meta property="og:url" content="https://dpantazatos.net/">
+<meta property="og:image" content="https://dpantazatos.net/assets/img/profile.jpg">
+<link rel="canonical" href="https://dpantazatos.net/">
+<link rel="icon" href="assets/img/favicon.ico" sizes="32x32">
+<link rel="icon" href="assets/img/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="assets/img/apple-touch-icon.png">
+<link rel="manifest" href="assets/img/manifest.webmanifest">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600;700&family=Silkscreen:wght@400;700&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   TOKENS
+   Palette: a network-operations console at dusk — indigo slate,
+   printed-proceedings bone, Aegean blue, status-LED amber.
+   ============================================================ */
+:root{
+  --ink:#141726;
+  --ink-2:#1E2338;
+  --ink-3:#2C3350;
+  --floor:#3A4266;
+  --bone:#EFE9DC;
+  --bone-2:#DED5C2;
+  --bone-3:#BBAF97;
+  --aegean:#2E6BB3;
+  --aegean-lt:#5AA0E4;
+  --amber:#F0B23C;
+  --olive:#6E8C4A;
+  --terra:#A9503A;
+  --rule:rgba(20,23,38,.14);
+
+  --display:'Silkscreen',ui-monospace,monospace;
+  --body:'IBM Plex Sans',system-ui,-apple-system,'Segoe UI',sans-serif;
+  --data:'IBM Plex Mono',ui-monospace,'SFMono-Regular',monospace;
+
+  --pad:clamp(1.25rem,4vw,3.5rem);
+}
+
+*,*::before,*::after{box-sizing:border-box}
+html,body{margin:0;padding:0}
+html{-webkit-text-size-adjust:100%}
+body{
+  font-family:var(--body);
+  background:var(--ink);
+  color:var(--bone);
+  overflow-x:hidden;
+}
+img{max-width:100%;display:block}
+a{color:inherit}
+
+:focus-visible{
+  outline:3px solid var(--amber);
+  outline-offset:2px;
+  border-radius:2px;
+}
+
+/* ============================================================
+   MODE SWITCHING  (game <-> document)
+   The document is always in the DOM. The game only ever borrows
+   its content, so there is exactly one copy of the CV.
+   ============================================================ */
+#doc{display:none}
+body.mode-doc #stage{display:none}
+body.mode-doc #doc{display:block}
+body.mode-doc{background:var(--bone);color:var(--ink);overflow-y:auto}
+body.mode-game{overflow:hidden;height:100dvh}
+
+.skip{
+  position:fixed;top:0;left:50%;transform:translate(-50%,-120%);
+  z-index:99;background:var(--amber);color:var(--ink);
+  font-family:var(--data);font-size:.8rem;padding:.6rem 1rem;
+  text-decoration:none;transition:transform .15s;
+}
+.skip:focus{transform:translate(-50%,0)}
+
+/* ============================================================
+   STAGE — canvas, HUD, controls
+   ============================================================ */
+#stage{
+  position:fixed;inset:0;
+  display:grid;grid-template-rows:auto 1fr auto;
+  background:var(--ink);
+}
+#scene{
+  grid-row:1/-1;grid-column:1;
+  width:100%;height:100%;
+  display:block;
+  image-rendering:pixelated;
+  image-rendering:crisp-edges;
+  touch-action:none;
+}
+
+.hud{
+  grid-row:1;grid-column:1;
+  z-index:3;pointer-events:none;
+  display:flex;align-items:flex-start;justify-content:space-between;
+  gap:1rem;padding:clamp(.7rem,2vw,1.25rem);
+}
+.hud > *{pointer-events:auto}
+
+.nameplate{
+  background:rgba(20,23,38,.82);
+  border:2px solid var(--ink-3);
+  border-bottom-width:4px;
+  padding:.5rem .75rem;
+  backdrop-filter:blur(4px);
+}
+.nameplate h1{
+  font-family:var(--display);
+  font-size:clamp(.72rem,2.4vw,1rem);
+  font-weight:700;letter-spacing:.02em;
+  margin:0;color:var(--bone);
+}
+.nameplate p{
+  margin:.35rem 0 0;font-family:var(--data);
+  font-size:.66rem;letter-spacing:.06em;text-transform:uppercase;
+  color:var(--aegean-lt);
+}
+
+.hud-right{display:flex;flex-direction:column;align-items:flex-end;gap:.5rem}
+
+.btn{
+  font-family:var(--data);font-size:.72rem;letter-spacing:.04em;
+  background:var(--bone);color:var(--ink);
+  border:2px solid var(--ink);border-bottom-width:4px;
+  padding:.5rem .8rem;cursor:pointer;
+  text-decoration:none;display:inline-block;
+  transition:transform .08s,background .15s;
+}
+.btn:hover{background:#fff}
+.btn:active{transform:translateY(2px);border-bottom-width:2px}
+.btn--ghost{background:transparent;color:var(--bone);border-color:var(--ink-3)}
+.btn--ghost:hover{background:var(--ink-2);color:var(--bone)}
+
+.progress{
+  font-family:var(--data);font-size:.66rem;letter-spacing:.08em;
+  color:var(--bone-3);background:rgba(20,23,38,.82);
+  border:2px solid var(--ink-3);padding:.35rem .6rem;
+}
+.progress b{color:var(--amber);font-weight:500}
+
+/* boot + hint line */
+.ticker{
+  grid-row:3;grid-column:1;z-index:3;pointer-events:none;
+  justify-self:center;margin-bottom:clamp(.7rem,2vw,1.25rem);
+  font-family:var(--data);font-size:.72rem;letter-spacing:.04em;
+  color:var(--bone);background:rgba(20,23,38,.85);
+  border:2px solid var(--ink-3);padding:.4rem .8rem;
+  max-width:min(92vw,44rem);text-align:center;
+}
+.ticker kbd{
+  font-family:var(--data);background:var(--bone);color:var(--ink);
+  padding:0 .3rem;border-radius:2px;font-size:.72rem;
+}
+
+/* touch controls */
+.pad{
+  position:fixed;z-index:4;bottom:max(1rem,env(safe-area-inset-bottom));
+  display:none;user-select:none;-webkit-user-select:none;
+}
+body.touch .pad{display:block}
+.pad--move{left:1rem;width:9.5rem;height:9.5rem}
+.pad--act{right:1rem;width:5rem;height:5rem}
+.pad button{
+  position:absolute;background:rgba(239,233,220,.16);
+  border:2px solid rgba(239,233,220,.5);color:var(--bone);
+  font-family:var(--display);font-size:1rem;
+  width:3.1rem;height:3.1rem;cursor:pointer;
+}
+.pad button:active{background:rgba(240,178,60,.55)}
+.pad--move .up{left:3.2rem;top:0}
+.pad--move .down{left:3.2rem;top:6.4rem}
+.pad--move .left{left:0;top:3.2rem}
+.pad--move .right{left:6.4rem;top:3.2rem}
+.pad--act button{
+  width:5rem;height:5rem;border-radius:50%;
+  background:rgba(240,178,60,.28);border-color:var(--amber);
+  font-size:.7rem;font-family:var(--data);
+}
+
+/* ============================================================
+   PANEL — the printout that opens at each station
+   ============================================================ */
+.panel{
+  position:fixed;inset:0;z-index:10;
+  display:none;place-items:center;
+  padding:clamp(.75rem,3vw,2rem);
+  background:rgba(10,12,22,.72);
+}
+.panel[open]{display:grid}
+.panel__sheet{
+  position:relative;
+  width:min(52rem,100%);max-height:min(86dvh,54rem);
+  overflow-y:auto;overscroll-behavior:contain;
+  background:var(--bone);color:var(--ink);
+  border:3px solid var(--ink);
+  box-shadow:10px 10px 0 rgba(0,0,0,.35);
+  padding:clamp(1.25rem,3.5vw,2.5rem);
+  animation:sheet .16s ease-out;
+}
+@keyframes sheet{from{transform:translateY(10px);opacity:0}to{transform:none;opacity:1}}
+.panel__eyebrow{
+  font-family:var(--data);font-size:.66rem;letter-spacing:.16em;
+  text-transform:uppercase;color:var(--terra);margin:0 0 .35rem;
+}
+.panel__sheet > h2{
+  font-family:var(--display);font-size:clamp(1.1rem,3.4vw,1.6rem);
+  margin:0 0 1.25rem;line-height:1.3;
+}
+.panel__close{
+  position:absolute;top:.6rem;right:.6rem;
+  font-family:var(--data);font-size:.75rem;
+  background:var(--ink);color:var(--bone);border:0;
+  padding:.35rem .6rem;cursor:pointer;
+}
+.panel__close:hover{background:var(--terra)}
+.panel__foot{
+  margin-top:1.5rem;padding-top:.9rem;border-top:2px dashed var(--bone-3);
+  font-family:var(--data);font-size:.7rem;color:#5C5647;
+}
+
+/* ============================================================
+   SHARED CONTENT STYLES (used in panel and in document)
+   ============================================================ */
+.entry{margin:0 0 1.4rem}
+.entry:last-child{margin-bottom:0}
+.entry h3{
+  font-size:1.02rem;font-weight:600;margin:0;line-height:1.35;
+}
+.entry .org{
+  font-family:var(--data);font-size:.78rem;color:var(--aegean);
+  margin:.15rem 0 0;
+}
+.entry .when{
+  font-family:var(--data);font-size:.7rem;letter-spacing:.06em;
+  color:#6B6455;margin:.2rem 0 .5rem;text-transform:uppercase;
+}
+.entry p{margin:.4rem 0 0;font-size:.92rem;line-height:1.6;color:#33302A}
+.entry ul{margin:.4rem 0 0;padding-left:1.1rem;font-size:.92rem;line-height:1.6;color:#33302A}
+
+.taglist{list-style:none;margin:.5rem 0 0;padding:0;display:flex;flex-wrap:wrap;gap:.4rem}
+.taglist li{
+  font-family:var(--data);font-size:.72rem;
+  border:1.5px solid var(--ink);padding:.2rem .5rem;background:#fff;
+}
+.skillgroup{margin:0 0 1.1rem}
+.skillgroup h3{
+  font-family:var(--data);font-size:.7rem;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--terra);margin:0;font-weight:500;
+}
+
+.pubyear{
+  font-family:var(--display);font-size:1.1rem;margin:1.5rem 0 .6rem;
+  padding-bottom:.2rem;border-bottom:2px solid var(--ink);
+}
+.pubyear:first-of-type{margin-top:0}
+.pub{
+  font-size:.86rem;line-height:1.55;color:#33302A;
+  margin:0 0 .9rem;padding-left:.9rem;border-left:2px solid var(--bone-3);
+}
+.pub em{font-style:normal;font-weight:600;color:var(--ink)}
+.pub .doi{font-family:var(--data);font-size:.75rem;color:var(--aegean)}
+
+.projects{
+  list-style:none;margin:0;padding:0;
+  display:grid;gap:1rem;
+  grid-template-columns:repeat(auto-fill,minmax(9rem,1fr));
+}
+.projects a{
+  display:flex;flex-direction:column;gap:.5rem;align-items:center;
+  text-align:center;text-decoration:none;color:var(--ink);
+  border:2px solid var(--ink);background:#fff;padding:.9rem .6rem;
+  transition:transform .1s,box-shadow .1s;
+}
+.projects a:hover{transform:translate(-2px,-2px);box-shadow:4px 4px 0 var(--amber)}
+.projects img{height:2.6rem;width:auto;object-fit:contain}
+.projects span{font-family:var(--data);font-size:.72rem}
+
+.links{list-style:none;margin:0;padding:0;display:grid;gap:.5rem}
+.links a{
+  font-family:var(--data);font-size:.85rem;text-decoration:none;
+  display:flex;gap:.6rem;align-items:baseline;
+  border-bottom:1.5px solid var(--rule);padding:.45rem .1rem;
+}
+.links a:hover{color:var(--terra)}
+.links .k{color:#6B6455;min-width:5.5rem;font-size:.7rem;
+  letter-spacing:.1em;text-transform:uppercase}
+
+.portrait{
+  float:right;width:7.5rem;margin:0 0 1rem 1.25rem;
+  border:3px solid var(--ink);
+}
+
+/* ============================================================
+   GAME THEORY MINIGAME — the one indulgence, and it is his thesis
+   ============================================================ */
+.gt{margin-top:1rem;font-family:var(--data)}
+.gt__matrix{
+  border-collapse:collapse;font-size:.74rem;margin:0 0 1rem;width:100%;
+  max-width:26rem;
+}
+.gt__matrix th,.gt__matrix td{
+  border:2px solid var(--ink);padding:.45rem .4rem;text-align:center;
+}
+.gt__matrix th{background:var(--ink);color:var(--bone);font-weight:500}
+.gt__matrix td{background:#fff}
+.gt__matrix td.hot{background:var(--amber)}
+.gt__choices{display:flex;gap:.6rem;flex-wrap:wrap;margin-bottom:.9rem}
+.gt__log{
+  font-size:.75rem;line-height:1.7;background:#fff;
+  border:2px solid var(--ink);padding:.7rem .8rem;min-height:5.5rem;
+  max-height:11rem;overflow-y:auto;color:#33302A;
+}
+.gt__log b{color:var(--terra)}
+.gt__score{
+  display:flex;gap:1.25rem;font-size:.78rem;margin:.8rem 0 0;
+  padding-top:.6rem;border-top:2px solid var(--bone-3);
+}
+.gt__score b{font-size:1.1rem;color:var(--aegean)}
+
+/* ============================================================
+   DOCUMENT MODE — the CV as a document, for people in a hurry
+   ============================================================ */
+.doc-bar{
+  position:sticky;top:0;z-index:20;
+  background:var(--ink);color:var(--bone);
+  display:flex;align-items:center;justify-content:space-between;
+  gap:1rem;padding:.7rem var(--pad);
+}
+.doc-bar strong{font-family:var(--display);font-size:.8rem;font-weight:400}
+.doc-bar nav{display:flex;gap:1rem;flex-wrap:wrap}
+.doc-bar nav a{
+  font-family:var(--data);font-size:.72rem;letter-spacing:.06em;
+  text-decoration:none;color:var(--bone-3);
+}
+.doc-bar nav a:hover{color:var(--amber)}
+@media (max-width:860px){.doc-bar nav{display:none}}
+
+.doc-wrap{max-width:64rem;margin:0 auto;padding:0 var(--pad) 5rem}
+
+.doc-hero{padding:clamp(2.5rem,7vw,5rem) 0 clamp(1.5rem,4vw,2.5rem)}
+.doc-hero h1{
+  font-family:var(--display);font-weight:400;
+  font-size:clamp(1.6rem,5.5vw,3rem);line-height:1.25;margin:0;
+}
+.doc-hero .role{
+  font-family:var(--data);font-size:.8rem;letter-spacing:.12em;
+  text-transform:uppercase;color:var(--terra);margin:.8rem 0 0;
+}
+.doc-hero .lede{
+  font-size:clamp(1rem,2.2vw,1.15rem);line-height:1.7;
+  max-width:42rem;margin:1.25rem 0 0;color:#33302A;
+}
+
+.doc-sec{padding:clamp(2rem,5vw,3.25rem) 0;border-top:2px solid var(--ink)}
+.doc-sec > h2{
+  font-family:var(--display);font-weight:400;
+  font-size:clamp(1.05rem,2.8vw,1.4rem);margin:0 0 1.75rem;
+}
+.doc-sec > h2::before{
+  content:attr(data-n);font-family:var(--data);font-size:.7rem;
+  color:var(--terra);margin-right:.9rem;vertical-align:.35em;
+}
+.doc-grid{display:grid;gap:2rem;grid-template-columns:1fr}
+@media (min-width:820px){
+  .doc-grid--2{grid-template-columns:1fr 1fr;gap:2rem 3rem}
+}
+
+.doc-foot{
+  border-top:2px solid var(--ink);padding:2rem 0 0;
+  font-family:var(--data);font-size:.72rem;color:#6B6455;
+  display:flex;justify-content:space-between;flex-wrap:wrap;gap:1rem;
+}
+
+@media (prefers-reduced-motion:reduce){
+  *{animation-duration:.001ms !important;transition-duration:.001ms !important}
+}
+</style>
+<noscript><style>
+  #stage,.pad,.skip{display:none !important}
+  #doc{display:block !important}
+  body{background:var(--bone);color:var(--ink);overflow:auto;height:auto}
+  .doc-bar [data-game]{display:none}
+</style></noscript>
+</head>
+<body class="mode-game">
+
+<a class="skip" href="#doc" data-doc>Skip the game, read the CV</a>
+
+<!-- ============================================================
+     GAME
+     ============================================================ -->
+<div id="stage">
+  <canvas id="scene" aria-label="A top-down floor plan you can walk around. The full CV is available as a document below."></canvas>
+
+  <div class="hud">
+    <div class="nameplate">
+      <h1>Dimitris Pantazatos</h1>
+      <p>AI &amp; data solutions &middot; Athens</p>
+    </div>
+    <div class="hud-right">
+      <button class="btn" type="button" data-doc>Read as document</button>
+      <p class="progress">Found <b id="found">0</b> / <span id="total">9</span></p>
+    </div>
+  </div>
+
+  <p class="ticker" id="ticker">Loading floor plan&hellip;</p>
+</div>
+
+<div class="pad pad--move" aria-hidden="true">
+  <button class="up"    type="button" data-move="up">&uarr;</button>
+  <button class="left"  type="button" data-move="left">&larr;</button>
+  <button class="right" type="button" data-move="right">&rarr;</button>
+  <button class="down"  type="button" data-move="down">&darr;</button>
+</div>
+<div class="pad pad--act" aria-hidden="true">
+  <button type="button" data-act>OPEN</button>
+</div>
+
+<div class="panel" id="panel" role="dialog" aria-modal="true" aria-labelledby="panel-title">
+  <div class="panel__sheet">
+    <button class="panel__close" type="button" data-close>ESC ✕</button>
+    <p class="panel__eyebrow" id="panel-eyebrow"></p>
+    <h2 id="panel-title"></h2>
+    <div id="panel-body"></div>
+    <p class="panel__foot" id="panel-foot"></p>
+  </div>
+</div>
+
+<!-- ============================================================
+     DOCUMENT — the single source of truth. The game clones from
+     here, so editing a section updates both views.
+     ============================================================ -->
+<main id="doc">
+  <div class="doc-bar">
+    <strong>Dimitris Pantazatos</strong>
+    <nav>
+      <a href="#about">About</a>
+      <a href="#experience">Experience</a>
+      <a href="#projects">Projects</a>
+      <a href="#education">Education</a>
+      <a href="#publications">Publications</a>
+      <a href="#skills">Skills</a>
+      <a href="#contact">Contact</a>
+    </nav>
+    <button class="btn" type="button" data-game>Back to the floor plan</button>
+  </div>
+
+  <div class="doc-wrap">
+    <header class="doc-hero">
+      <h1>Dimitris Pantazatos</h1>
+      <p class="role">AI &amp; data solutions leader &middot; applied AI and digital transformation</p>
+      <p class="lede">I design and ship production AI systems in enterprise environments — architecture, ML pipelines, cloud deployment and the unglamorous parts that decide whether any of it survives contact with real operations. Ten years across applied AI, data architecture and digital platforms, in Athens.</p>
+    </header>
+
+    <section class="doc-sec" id="about"
+             data-station="About" data-eyebrow="The desk" data-foot="The mug is cold. It has been cold for some time.">
+      <h2 data-n="01">About</h2>
+      <div class="entry">
+        <img class="portrait" src="assets/img/profile.jpg" alt="Dimitris Pantazatos" width="120" height="120" loading="lazy">
+        <p>I work at the point where technology, operations and the business have to agree on something. That usually means owning a solution end to end: the architecture, the ML pipelines, the cloud integration, and the release readiness that turns a promising model into a system somebody depends on at 9am on a Monday.</p>
+        <p>I lead hands-on. I set the standards for quality, security and MLOps, review the code, and mentor engineers across software, data and DevOps — including people who do not report to me. I came to this from economics and informatics rather than from pure engineering, which is probably why I care as much about what a system costs and who has to use it as about how it is built.</p>
+        <p>Based in Athens. Greek native, English at C2.</p>
+      </div>
+    </section>
+
+    <section class="doc-sec" id="experience"
+             data-station="Experience" data-eyebrow="Filing cabinets" data-foot="Ten years of drawers. Most of them stick.">
+      <h2 data-n="02">Experience</h2>
+      <div class="doc-grid doc-grid--2">
+
+        <div class="entry">
+          <h3>AI &amp; Data Solutions Manager</h3>
+          <p class="org">Hellenic Telecommunications Organization &middot; Athens</p>
+          <p class="when">March 2025 &ndash; present</p>
+          <ul>
+            <li>Own the end-to-end technical design and delivery of scalable AI and data solutions, from architecture and ML pipelines through cloud integration to production readiness.</li>
+            <li>Take autonomous technical decisions on solution architecture, technology stack, ML approaches and Azure services.</li>
+            <li>Define and enforce standards for MLOps, monitoring, validation, security and release readiness.</li>
+            <li>Act as hands-on technical lead for software, data and DevOps engineers, influencing technical standards beyond direct reporting lines.</li>
+          </ul>
+          <p><strong>Selected work.</strong> Co-designed and productionised DoRe, an AI-driven document recognition and invoice processing system now supporting core procurement and finance operations. Designed and led the implementation of agentic AI solutions across business analysis, HR, procurement workflows and RFP management. Established the validation rules, error handling, alerting and human-in-the-loop controls that cut manual processing effort and error rates.</p>
+        </div>
+
+        <div class="entry">
+          <h3>AI &amp; Data Solutions Architect</h3>
+          <p class="org">100Mentors &middot; Athens</p>
+          <p class="when">July 2022 &ndash; March 2025</p>
+          <ul>
+            <li>Designed and implemented the AI and data solutions behind the company's core products.</li>
+            <li>Led data strategy to keep quality, security and consistency intact across the analytics and BI layers.</li>
+            <li>Evaluated emerging AI, ML and data technologies and introduced the ones that earned their place in the product.</li>
+            <li>Technical lead for a team of data analysts and software engineers: mentoring, code review, direction.</li>
+          </ul>
+        </div>
+
+        <div class="entry">
+          <h3>Research Associate</h3>
+          <p class="org">Network Management &amp; Optimal Design Laboratory &middot; Athens</p>
+          <p class="when">October 2016 &ndash; October 2026</p>
+          <ul>
+            <li>Worked on multiple EU-funded projects (Horizon 2020, Horizon Europe, Erasmus+) spanning AI/ML, data analysis and digital infrastructure.</li>
+            <li>Contributed to work packages on learning analytics, digital material analysis, networked platforms and AI-enabled services.</li>
+            <li>Designed and maintained laboratory web platforms and infrastructure, including security and system administration.</li>
+            <li>Supported undergraduate and postgraduate teaching in intelligent networks, stochastic processes and optimisation in machine learning.</li>
+          </ul>
+        </div>
+
+        <div class="entry">
+          <h3>E-Learning Specialist</h3>
+          <p class="org">HYGIEIA Scientific Research &amp; Educational Cluster &middot; Athens</p>
+          <p class="when">May 2019 &ndash; January 2022</p>
+          <ul>
+            <li>Designed, developed and administered e-learning platforms and blended learning courses.</li>
+            <li>Analysed learning data to improve course effectiveness and engagement.</li>
+          </ul>
+        </div>
+
+        <div class="entry" style="grid-column:1/-1">
+          <h3>Earlier career</h3>
+          <p class="when">2009 &ndash; 2021</p>
+          <ul>
+            <li><strong>IT programming tutor</strong> — IEK ALFA &amp; IEK Korelko, 2015&ndash;2021</li>
+            <li><strong>Web developer &amp; digital marketing assistant</strong> — Korelko Group, 2015&ndash;2016</li>
+            <li><strong>Non-profit programme coordinator</strong> — NCDP Greece, 2014&ndash;2015</li>
+            <li><strong>Customer support representative</strong> — ICAP Group, 2009&ndash;2014</li>
+          </ul>
+        </div>
+
+      </div>
+    </section>
+
+    <section class="doc-sec" id="projects"
+             data-station="Projects" data-eyebrow="Pinboard" data-foot="Six pins, several time zones.">
+      <h2 data-n="03">Projects</h2>
+      <p class="lede" style="font-size:.95rem;margin:0 0 1.5rem">Selected EU-funded projects and the role I held on each.</p>
+      <ul class="projects">
+        <li><a href="https://geant.org/"><span>GÉANT GN5-2<br><em style="font-style:normal;color:#6B6455">AI &amp; data solution architect, WP6</em></span></a></li>
+        <li><a href="https://soulss.eu/"><span>SOULSS<br><em style="font-style:normal;color:#6B6455">Learning analytics &amp; infrastructure</em></span></a></li>
+        <li><a href="https://www.we-collab.eu/en/project/we-collab/"><span>WE-COLLAB<br><em style="font-style:normal;color:#6B6455">Learning analytics &amp; platforms</em></span></a></li>
+        <li><a href="https://up2digischool.eu/"><span>Up2DigiSchool<br><em style="font-style:normal;color:#6B6455">Learning scenarios &amp; analytics</em></span></a></li>
+        <li><a href="https://success4all.eu/"><span>SUCCESS4ALL<br><em style="font-style:normal;color:#6B6455">Inclusive digital learning</em></span></a></li>
+        <li><a href="https://cordis.europa.eu/project/id/732049"><span>Up2University<br><em style="font-style:normal;color:#6B6455">€5M, multiple work packages</em></span></a></li>
+      </ul>
+    </section>
+
+    <section class="doc-sec" id="education"
+             data-station="Education" data-eyebrow="Framed on the wall" data-foot="Two of these are hanging slightly crooked.">
+      <h2 data-n="04">Education &amp; certifications</h2>
+      <div class="doc-grid doc-grid--2">
+        <div class="entry">
+          <h3>MBA</h3>
+          <p class="org">Athens University of Economics and Business</p>
+          <p class="when">2025 &ndash; present</p>
+        </div>
+        <div class="entry">
+          <h3>MSc Big Data Analytics</h3>
+          <p class="org">University of Derby</p>
+          <p class="when">2022 &ndash; 2023</p>
+        </div>
+        <div class="entry">
+          <h3>MSc Informatics</h3>
+          <p class="org">University of Piraeus</p>
+          <p class="when">2013 &ndash; 2016</p>
+          <p>Thesis: an introduction to game theory and its applications in economics and negotiations.</p>
+        </div>
+        <div class="entry">
+          <h3>BA Economics</h3>
+          <p class="org">University of Piraeus</p>
+          <p class="when">2008 &ndash; 2013</p>
+        </div>
+        <div class="entry" style="grid-column:1/-1">
+          <h3>Certifications</h3>
+          <ul class="taglist">
+            <li>Azure Data Scientist Associate — 2025&ndash;2026</li>
+            <li>Azure AI Engineer Associate — 2025&ndash;2026</li>
+            <li>FinOps Certified Practitioner — 2025&ndash;2027</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="doc-sec" id="skills"
+             data-station="Skills" data-eyebrow="The rack" data-foot="It hums. It always hums.">
+      <h2 data-n="05">Skills</h2>
+      <div class="doc-grid doc-grid--2">
+        <div>
+          <div class="skillgroup">
+            <h3>Building</h3>
+            <ul class="taglist">
+              <li>Applied AI &amp; machine learning (production systems)</li>
+              <li>AI &amp; data architecture (end-to-end design)</li>
+              <li>Data &amp; ML pipelines</li>
+              <li>AI integration with business applications</li>
+            </ul>
+          </div>
+          <div class="skillgroup">
+            <h3>Running</h3>
+            <ul class="taglist">
+              <li>Cloud-first solutions — Azure ecosystem</li>
+              <li>MLOps &amp; release readiness</li>
+              <li>Process automation &amp; digital transformation</li>
+            </ul>
+          </div>
+        </div>
+        <div>
+          <div class="skillgroup">
+            <h3>Leading</h3>
+            <ul class="taglist">
+              <li>Technical leadership &amp; mentoring</li>
+              <li>Stakeholder collaboration — IT, procurement, legal</li>
+            </ul>
+          </div>
+          <div class="skillgroup">
+            <h3>Languages</h3>
+            <ul class="taglist"><li>Greek — native</li><li>English — C2</li></ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="doc-sec" id="publications"
+             data-station="Publications" data-eyebrow="The archive shelf" data-foot="Full list on Google Scholar.">
+      <h2 data-n="06">Publications</h2>
+      <p class="lede" style="font-size:.95rem;margin:0 0 1.5rem">Peer-reviewed work from the research years, mostly on learning analytics and, latterly, on interpreting ML classifiers.</p>
+
+      <h3 class="pubyear">2023</h3>
+      <p class="pub">N. Kostopoulos, D. Kalogeras, <em>D. Pantazatos</em>, M. Grammatikou, V. Maglaris. SHAP interpretations of tree and neural network DNS classifiers for analyzing DGA family characteristics. <em>IEEE Access</em>. <a class="doi" href="https://doi.org/10.1109/ACCESS.2023.3286313">10.1109/ACCESS.2023.3286313</a></p>
+
+      <h3 class="pubyear">2022</h3>
+      <p class="pub">I. Bakaniene, M. Dominiak-Świgoń, M. A. Meneses da Silva Santos, <em>D. Pantazatos</em>, M. Grammatikou, M. Montanari, I. Virgili, G. Galeoto, P. Flocco, L. Bernabei, A. Prasauskiene. Challenges of online learning for children with special educational needs and disabilities during the COVID-19 pandemic: a scoping review. <em>Journal of Intellectual &amp; Developmental Disability</em>, 48(2), 105&ndash;116. <a class="doi" href="https://doi.org/10.3109/13668250.2022.2096956">10.3109/13668250.2022.2096956</a></p>
+
+      <h3 class="pubyear">2021</h3>
+      <p class="pub"><em>D. Pantazatos</em>, M. Grammatikou, M. Montanari, S. Lariccia, G. Cibulskis, V. Maglaris. Examining the impact of a Next Generation Digital Learning Environment in high school students before and during COVID-19. <em>INTED 2021</em>.</p>
+      <p class="pub">M. Grammatikou, M. Montanari, <em>D. Pantazatos</em>, I. Barth, A. Third, S. Lariccia, V. Maglaris. Progressing from the emergency to the optimum in online learning. <em>INTED 2021</em>.</p>
+      <p class="pub">M. Montanari, M. A. Santos, A. Third, C. Pellegrini, A. Prasauskiene, S. Lariccia, M. Grammatikou, <em>D. Pantazatos</em>. Digital learning for students with disabilities in primary school. <em>INTED 2021</em>.</p>
+
+      <h3 class="pubyear">2020</h3>
+      <p class="pub">M. Montanari, I. Barth, S. Lariccia, <em>D. Pantazatos</em>, F. Martinez De Carnero, N. Sansone, G. Toffoli. Using learning analytics in a Next Generation Digital Learning Environment to transition from face-to-face to remote learning. <em>ICERI 2020</em>.</p>
+      <p class="pub">M. Grammatikou, N. Sansone, <em>D. Pantazatos</em>, D. Cesareni, V. Maglaris. The design and redesign of an online socio-constructivist course on engineering management. Book chapter in <em>Cases on Engineering Management Education in Practice</em>, IGI Global.</p>
+      <p class="pub">I. Otero, <em>D. Pantazatos</em>, M. Grammatikou, D. Docampo. Learning analytics in a Next Generation Digital Learning Environment: lessons from secondary education teachers. <em>EDULEARN 2020</em>.</p>
+      <p class="pub">I. Otero, <em>D. Pantazatos</em>, M. Grammatikou, D. Docampo. Open Educational Resources awareness in secondary education. <em>EDULEARN 2020</em>.</p>
+      <p class="pub"><em>D. Pantazatos</em>, M. Grammatikou, I. Barth, S. Lariccia, V. Maglaris. Continuous professional development for secondary education teachers to adopt NGDLE platforms. <em>IEEE EDUCON 2020</em>.</p>
+      <p class="pub">I. Barth, J. Barokas, M. Grammatikou, <em>D. Pantazatos</em>, A. Urbaityte, S. Riskiene. Open Educational Resources for bridging high school &ndash; university gaps in academic English studies. <em>INTED 2020</em>.</p>
+
+      <h3 class="pubyear">2019</h3>
+      <p class="pub">I. Otero, <em>D. Pantazatos</em>, D. Docampo. First steps of creating an immersive scenario for improving naval skills. <em>ICERI 2019</em>, Seville.</p>
+      <p class="pub">M. Grammatikou, <em>D. Pantazatos</em>, I. Barth, A. Corleto, N. Sansone, M. Zimniewicz. Pilot results: usage and lessons learnt within the first pilots in Europe. <em>EDULEARN 2019</em>, Palma de Mallorca.</p>
+      <p class="pub">I. Otero, <em>D. Pantazatos</em>, D. Docampo. Good practices adopting copyright for creating and reusing OER. <em>INTED 2019</em>, Valencia.</p>
+
+      <h3 class="pubyear">2018</h3>
+      <p class="pub">I. Hatzakis, M. Grammatikou, A. Castro, P. Szegedi, <em>D. Pantazatos</em>. UP2U: bridging the gap between schools and universities through informal education. <em>EDULEARN 2018</em>, Palma de Mallorca.</p>
+      <p class="pub"><em>D. Pantazatos</em>, C. Marinos, K. Giotis, A. Vekris, M. Grammatikou, V. Maglaris. SelCont: synchronized e-learning content toolkit. <em>INTED 2018</em>, Valencia.</p>
+    </section>
+
+    <section class="doc-sec" id="interests"
+             data-station="Interests" data-eyebrow="The terrace" data-foot="Best light is about an hour before sunset.">
+      <h2 data-n="07">Interests</h2>
+      <div class="entry">
+        <p>I spend as much time outdoors as the job allows — photography, dancing and sport take most of it. Forced indoors, I read, watch films and play video games, which is roughly how this page came about.</p>
+      </div>
+    </section>
+
+    <section class="doc-sec" id="gametheory"
+             data-station="Game theory" data-eyebrow="Whiteboard, half-erased" data-foot="MSc thesis, University of Piraeus, 2016.">
+      <h2 data-n="08">Game theory</h2>
+      <div class="entry">
+        <p>My MSc thesis was an introduction to game theory and its applications in economics and negotiations. The prisoner's dilemma is the standard opening example: two players, one move each, and a payoff structure where the rational individual choice leaves both worse off than cooperation would.</p>
+      </div>
+      <div data-gt></div>
+    </section>
+
+    <section class="doc-sec" id="contact"
+             data-station="Contact" data-eyebrow="Pigeonhole by the door" data-foot="Email is the reliable one.">
+      <h2 data-n="09">Contact</h2>
+      <ul class="links">
+        <li><a href="#" data-mail><span class="k">Email</span><span data-mail-text>show address</span></a></li>
+        <li><a href="#" data-tel><span class="k">Mobile</span><span data-tel-text>show number</span></a></li>
+        <li><a href="https://www.linkedin.com/in/dimitris-pantazatos/"><span class="k">LinkedIn</span><span>dimitris-pantazatos</span></a></li>
+        <li><a href="https://scholar.google.gr/citations?user=NddDnN4AAAAJ&amp;hl=en"><span class="k">Scholar</span><span>Google Scholar profile</span></a></li>
+        <li><a href="https://github.com/Dimitrispant"><span class="k">GitHub</span><span>Dimitrispant</span></a></li>
+        <li><a href="assets/Dimitris-Pantazatos-Resume.pdf"><span class="k">Full CV</span><span>PDF</span></a></li>
+      </ul>
+    </section>
+
+    <footer class="doc-foot">
+      <span>Athens, Greece</span>
+      <span>Built as a floor plan you can walk around.</span>
+    </footer>
+  </div>
+</main>
+
+<script type="application/ld+json">
+{
+  "@context":"https://schema.org",
+  "@type":"Person",
+  "name":"Dimitris Pantazatos",
+  "url":"https://dpantazatos.net/",
+  "image":"https://dpantazatos.net/assets/img/profile.jpg",
+  "jobTitle":"AI & Data Solutions Manager",
+  "address":{"@type":"PostalAddress","addressLocality":"Athens","addressCountry":"GR"},
+  "alumniOf":[
+    {"@type":"CollegeOrUniversity","name":"Athens University of Economics and Business"},
+    {"@type":"CollegeOrUniversity","name":"University of Derby"},
+    {"@type":"CollegeOrUniversity","name":"University of Piraeus"}
+  ],
+  "knowsAbout":["Applied AI","Machine Learning","Data Architecture","MLOps","Azure","Learning Analytics","Game Theory"],
+  "knowsLanguage":["el","en"],
+  "sameAs":[
+    "https://www.linkedin.com/in/dimitris-pantazatos/",
+    "https://scholar.google.gr/citations?user=NddDnN4AAAAJ&hl=en",
+    "https://github.com/Dimitrispant"
+  ]
+}
+</script>
+<script>
+/* =============================================================
+   dpantazatos.net — a floor plan you can walk around.
+   No dependencies, no build step. Everything is drawn from
+   rectangles; the only assets are the ones already on the site.
+   ============================================================= */
+(function () {
+  'use strict';
+
+  /* ---------- 1. map ------------------------------------------------ */
+
+  var MAP = [
+    '########################################',
+    '#.bbbbbbb...WWW..pppppppp..o-.fffffff..#',
+    '#......................................#',
+    '#..............t.....................t.#',
+    '#d.........................t...........#',
+    '#d.....................................#',
+    '#d.....................................#',
+    '#d....,,,,,,,,.........................#',
+    '#d....,,====,,.........................#',
+    '#.....,,====,,.................t.......#',
+    '#.....,,,cc,,,.........................#',
+    '#..t..,,,,,,,,.........................#',
+    '#..................#wwwwwwww#..........#',
+    '####.............................R~~~~~#',
+    '#s...............................R~~~~~#',
+    '#s...............................R~t~~~#',
+    '#s...............................R~~~~~#',
+    '#s...............................+~~~~~#',
+    '#s..............t................R~~~~~#',
+    '#s...............................R~B~t~#',
+    '####.........................t...R~~k~~#',
+    '#.....t..........m,,,,...........R~~~~~#',
+    '#.................,,,,.................#',
+    '###################EE###################'
+  ];
+
+  var TILE = 16;
+  var COLS = MAP[0].length;
+  var ROWS = MAP.length;
+  var SOLID = '#bpfdswtoRB=mWE-k';
+
+  function tileAt(cx, cy) {
+    if (cy < 0 || cy >= ROWS || cx < 0 || cx >= COLS) return '#';
+    return MAP[cy].charAt(cx);
+  }
+  function blocked(cx, cy) {
+    return SOLID.indexOf(tileAt(cx, cy)) !== -1;
+  }
+
+  /* ---------- 2. palette -------------------------------------------- */
+
+  var C = {
+    floorA: '#39406A', floorB: '#353C63', grout: '#2B3150',
+    rugA: '#6B4238', rugB: '#7A4C3F', rugEdge: '#4E2F28',
+    wall: '#262D4B', wallTop: '#39426C', wallBase: '#1A1F36',
+    wood: '#8A6642', woodDark: '#5C4029', woodLight: '#A67F55',
+    metal: '#6E7796', metalDark: '#454D6E', metalLight: '#8C95B4',
+    glass: '#2E6BB3', glassLit: '#5AA0E4', aegean: '#2E6BB3',
+    bone: '#EFE9DC', bone2: '#CFC6B0',
+    amber: '#F0B23C', olive: '#6E8C4A', oliveLt: '#8CAB61',
+    terra: '#A9503A', gold: '#C6A45A',
+    cork: '#A8763F', ink: '#141726',
+    stoneA: '#7E8474', stoneB: '#767C6D',
+    led: ['#7BD16E', '#F0B23C', '#5AA0E4']
+  };
+
+  var BOOK = ['#A9503A', '#2E6BB3', '#6E8C4A', '#C6A45A', '#8A4F7D', '#D8CFBA'];
+
+  /* deterministic pseudo-random so the room never shimmers */
+  function hash(x, y, s) {
+    var n = (x * 374761393 + y * 668265263 + (s || 0) * 2147483647) | 0;
+    n = (n ^ (n >> 13)) * 1274126177;
+    return ((n ^ (n >> 16)) >>> 0) / 4294967296;
+  }
+
+  /* ---------- 3. tile painters -------------------------------------- */
+
+  var ctx = null;
+  function px(x, y, w, h, col) { ctx.fillStyle = col; ctx.fillRect(x, y, w, h); }
+
+  function paintFloor(x, y, cx, cy) {
+    var even = (cx + cy) % 2 === 0;
+    px(x, y, TILE, TILE, even ? C.floorA : C.floorB);
+    px(x, y, TILE, 1, C.grout);
+    px(x, y, 1, TILE, C.grout);
+    if (hash(cx, cy, 7) > 0.93) px(x + 5, y + 9, 2, 1, C.grout);
+  }
+
+  function paintStone(x, y, cx, cy) {
+    px(x, y, TILE, TILE, (cx + cy) % 2 === 0 ? C.stoneA : C.stoneB);
+    px(x, y, TILE, 1, '#6A705F');
+    px(x, y, 1, TILE, '#6A705F');
+  }
+
+  function paintRug(x, y, cx, cy) {
+    px(x, y, TILE, TILE, C.rugA);
+    px(x, y, TILE, 1, C.rugEdge);
+    px(x, y, 1, TILE, C.rugEdge);
+    if ((cx + cy) % 2 === 0) {
+      px(x + 4, y + 4, 8, 8, C.rugB);
+      px(x + 6, y + 6, 4, 4, C.rugEdge);
+    } else {
+      px(x + 2, y + 7, 12, 2, C.rugB);
+      px(x + 7, y + 2, 2, 12, C.rugB);
+    }
+  }
+
+  function paintWall(x, y, cx, cy) {
+    px(x, y, TILE, TILE, C.wall);
+    px(x, y, TILE, 3, C.wallTop);
+    px(x, y + TILE - 2, TILE, 2, C.wallBase);
+    /* brick seams */
+    var off = cy % 2 ? 0 : 8;
+    px(x + off, y + 3, 1, 5, C.wallBase);
+    px(x + ((off + 8) % 16), y + 9, 1, 5, C.wallBase);
+    px(x, y + 8, TILE, 1, C.wallBase);
+  }
+
+  function paintWindow(x, y) {
+    paintWall(x, y);
+    px(x + 1, y + 3, 14, 10, '#101425');
+    px(x + 2, y + 4, 12, 8, C.glass);
+    px(x + 2, y + 4, 5, 8, C.glassLit);
+    px(x + 8, y + 4, 1, 8, '#101425');
+  }
+
+  function paintShelf(x, y, cx, cy) {
+    px(x, y, TILE, TILE, C.woodDark);
+    px(x, y, TILE, 2, C.woodLight);
+    for (var r = 0; r < 2; r++) {
+      var by = y + 3 + r * 7;
+      for (var i = 0; i < 5; i++) {
+        var h = 4 + Math.floor(hash(cx, cy, r * 10 + i) * 2);
+        px(x + 1 + i * 3, by + (6 - h), 2, h,
+           BOOK[Math.floor(hash(cx, cy, r + i * 3) * BOOK.length)]);
+      }
+      px(x, by + 6, TILE, 1, C.wood);
+    }
+  }
+
+  function paintPinboard(x, y, cx, cy) {
+    px(x, y, TILE, TILE, C.cork);
+    px(x, y, TILE, 2, '#6B4526');
+    px(x, y + TILE - 2, TILE, 2, '#6B4526');
+    var n = Math.floor(hash(cx, cy, 1) * 3);
+    for (var i = 0; i <= n; i++) {
+      var ox = 2 + Math.floor(hash(cx, cy, i * 5) * 8);
+      var oy = 3 + Math.floor(hash(cx, cy, i * 9) * 6);
+      px(x + ox, y + oy, 5, 6, i % 2 ? C.bone : C.bone2);
+      px(x + ox + 2, y + oy - 1, 1, 1, C.terra);
+    }
+  }
+
+  function paintCabinet(x, y) {
+    px(x, y, TILE, TILE, C.metal);
+    px(x, y, TILE, 2, C.metalLight);
+    px(x, y + TILE - 2, TILE, 2, C.metalDark);
+    px(x + 1, y + 4, 14, 4, C.metalDark);
+    px(x + 1, y + 10, 14, 4, C.metalDark);
+    px(x + 6, y + 5, 4, 1, C.amber);
+    px(x + 6, y + 11, 4, 1, C.amber);
+  }
+
+  function paintDiploma(x, y, cx, cy) {
+    paintWall(x, y, cx, cy);
+    px(x + 2, y + 3, 12, 10, C.gold);
+    px(x + 3, y + 4, 10, 8, C.bone);
+    px(x + 4, y + 6, 8, 1, '#9A9078');
+    px(x + 4, y + 8, 6, 1, '#9A9078');
+    px(x + 10, y + 9, 2, 2, C.terra);
+  }
+
+  function paintRack(x, y, cx, cy, t) {
+    px(x, y, TILE, TILE, '#20263D');
+    px(x, y, TILE, 2, '#333B5C');
+    for (var r = 0; r < 4; r++) {
+      var by = y + 3 + r * 3;
+      px(x + 1, by, 14, 2, '#2C3350');
+      var on = hash(cx, cy, r) * 3 + t * 0.0011;
+      var lit = (Math.sin(on) + 1) / 2 > 0.35;
+      px(x + 12, by, 1, 1, lit ? C.led[r % 3] : '#1A1F36');
+      px(x + 10, by, 1, 1, '#3E4770');
+    }
+  }
+
+  function paintDesk(x, y, cx, cy) {
+    px(x, y, TILE, TILE, C.wood);
+    px(x, y, TILE, 2, C.woodLight);
+    px(x, y + TILE - 3, TILE, 3, C.woodDark);
+    var top = tileAt(cx, cy - 1) !== '=';
+    if (top && cx % 2 === 0) {           /* monitor */
+      px(x + 2, y + 1, 12, 9, '#1A1F36');
+      px(x + 3, y + 2, 10, 7, C.glass);
+      px(x + 4, y + 3, 5, 1, C.glassLit);
+      px(x + 4, y + 5, 7, 1, '#8FC2F0');
+      px(x + 4, y + 7, 4, 1, '#8FC2F0');
+      px(x + 7, y + 10, 2, 2, '#1A1F36');
+    } else if (top) {                     /* mug + papers */
+      px(x + 2, y + 4, 11, 7, C.bone);
+      px(x + 3, y + 6, 7, 1, C.bone2);
+      px(x + 3, y + 8, 5, 1, C.bone2);
+      px(x + 11, y + 2, 4, 4, C.terra);
+      px(x + 12, y + 3, 2, 1, '#D08268');
+    }
+  }
+
+  function paintWhiteboard(x, y, cx, cy) {
+    px(x, y, TILE, TILE, '#9AA0B5');
+    px(x + 1, y + 1, 14, 12, '#E8E6DE');
+    px(x, y + 13, TILE, 3, '#6D7490');
+    /* half-erased payoff matrix, drawn across the whole board */
+    var k = cx % 8;
+    if (k === 1 || k === 5) px(x + 3, y + 3, 1, 8, '#5A6079');
+    if (k === 2) { px(x + 2, y + 4, 8, 1, '#5A6079'); px(x + 2, y + 8, 8, 1, '#5A6079'); }
+    if (k === 3) { px(x + 3, y + 3, 3, 3, C.aegean || '#2E6BB3'); px(x + 8, y + 7, 3, 3, C.terra); }
+    if (k === 6) { px(x + 4, y + 5, 6, 1, '#5A6079'); px(x + 4, y + 7, 4, 1, '#5A6079'); }
+    if (k === 7) px(x + 5, y + 4, 5, 5, C.amber);
+  }
+
+  function paintPlant(x, y, cx, cy) {
+    px(x + 5, y + 10, 6, 5, C.terra);
+    px(x + 5, y + 10, 6, 1, '#C56A50');
+    var s = hash(cx, cy, 2);
+    px(x + 7, y + 5, 2, 6, '#4F6B34');
+    px(x + 3, y + 4, 4, 4, C.olive);
+    px(x + 9, y + 3, 4, 4, C.oliveLt);
+    px(x + 6, y + 1, 4, 4, s > 0.5 ? C.oliveLt : C.olive);
+  }
+
+  function paintRail(x, y, cx, cy) {
+    paintFloor(x, y, cx, cy);
+    px(x + 5, y, 6, TILE, '#4E5878');
+    px(x + 5, y, 6, 2, '#69749A');
+    px(x + 7, y + 4, 2, 8, '#3A4364');
+  }
+
+  function paintBench(x, y) {
+    px(x, y + 4, TILE, 8, C.wood);
+    px(x, y + 4, TILE, 2, C.woodLight);
+    px(x, y + 2, TILE, 3, C.woodDark);
+    px(x + 1, y + 12, 2, 3, C.woodDark);
+    px(x + 13, y + 12, 2, 3, C.woodDark);
+  }
+
+  function paintCoffee(x, y, cx, cy, t) {
+    px(x + 2, y + 1, 12, 14, '#2C3350');
+    px(x + 3, y + 2, 10, 5, '#1A1F36');
+    px(x + 4, y + 3, 3, 2, (t % 1600) < 800 ? C.amber : '#5C4A22');
+    px(x + 5, y + 9, 6, 4, C.bone);
+    px(x + 2, y + 14, 12, 2, '#1A1F36');
+  }
+
+  function paintCounter(x, y) {
+    px(x, y + 2, TILE, 13, C.metalLight);
+    px(x, y + 2, TILE, 2, C.bone2);
+    px(x, y + 13, TILE, 2, C.metalDark);
+  }
+
+  function paintChair(x, y, cx, cy) {
+    paintRug(x, y, cx, cy);
+    px(x + 3, y + 3, 10, 9, C.metalDark);
+    px(x + 4, y + 4, 8, 6, '#3E4770');
+    px(x + 3, y + 12, 2, 3, '#22283F');
+    px(x + 11, y + 12, 2, 3, '#22283F');
+  }
+
+  function paintMailbox(x, y, cx, cy, t) {
+    paintFloor(x, y, cx, cy);
+    px(x + 4, y + 8, 8, 7, C.metalDark);
+    px(x + 3, y + 3, 10, 6, C.glass);
+    px(x + 3, y + 3, 10, 1, C.glassLit);
+    px(x + 5, y + 6, 6, 1, '#1A1F36');
+    px(x + 12, y + 1, 1, 4, C.metalDark);
+    px(x + 9, y + 1, 3, 3, (t % 1400) < 700 ? C.amber : C.terra);
+  }
+
+  function paintDoor(x, y) {
+    px(x, y, TILE, TILE, C.wallBase);
+    px(x + 1, y + 4, 14, 12, C.bone2);
+    px(x + 2, y + 5, 12, 11, C.bone);
+    px(x, y, TILE, 4, '#1F5C36');
+    px(x + 3, y + 1, 10, 2, '#7BD16E');
+  }
+
+
+  function paintCamera(x, y) {
+    px(x + 4, y + 9, 1, 6, C.metalDark);
+    px(x + 11, y + 9, 1, 6, C.metalDark);
+    px(x + 8, y + 9, 1, 6, C.metalDark);
+    px(x + 3, y + 4, 10, 6, '#22283F');
+    px(x + 3, y + 4, 10, 1, '#454D6E');
+    px(x + 9, y + 5, 4, 4, '#12162A');
+    px(x + 10, y + 6, 2, 2, C.glassLit);
+    px(x + 4, y + 2, 3, 2, '#22283F');
+    px(x + 5, y + 6, 2, 1, C.amber);
+  }
+
+  var PAINT = {
+    '.': paintFloor, ',': paintRug, '~': paintStone, '+': paintStone,
+    '#': paintWall, 'W': paintWindow, 'b': paintShelf, 'p': paintPinboard,
+    'f': paintCabinet, 'd': paintDiploma, 's': paintRack, '=': paintDesk,
+    'w': paintWhiteboard, 't': paintPlant, 'R': paintRail, 'B': paintBench,
+    'o': paintCoffee, '-': paintCounter, 'c': paintChair, 'm': paintMailbox,
+    'E': paintDoor, 'k': paintCamera
+  };
+
+  /* plants and mailboxes sit on a floor tile */
+  var ON_FLOOR = 'tomBk';
+
+  /* ---------- 4. player sprite -------------------------------------- */
+
+  var SPR = {
+    /* 0 clear · 1 outline · 2 hair · 3 skin · 4 shirt · 5 trousers · 6 shoe */
+    down: [
+      '............',
+      '...111111...',
+      '..12222221..',
+      '.1222222221.',
+      '.1333333331.',
+      '.1313333131.',
+      '.1333333331.',
+      '.1344444431.',
+      '134444444431',
+      '134444444431',
+      '.1444444441.',
+      '.1555555551.',
+      '.1555555551.',
+      '.155.55.551.',
+      '.166.11.661.',
+      '.111.11.111.'
+    ],
+    up: [
+      '............',
+      '...111111...',
+      '..12222221..',
+      '.1222222221.',
+      '.1222222221.',
+      '.1222222221.',
+      '.1322222231.',
+      '.1344444431.',
+      '134444444431',
+      '134444444431',
+      '.1444444441.',
+      '.1555555551.',
+      '.1555555551.',
+      '.155.55.551.',
+      '.166.11.661.',
+      '.111.11.111.'
+    ],
+    side: [
+      '............',
+      '...111111...',
+      '..12222221..',
+      '..12222221..',
+      '..13333331..',
+      '..13113331..',
+      '..13333331..',
+      '..14444441..',
+      '.134444441..',
+      '.134444441..',
+      '..14444441..',
+      '..15555551..',
+      '..15555551..',
+      '..155.5551..',
+      '..166.1661..',
+      '..111.1111..'
+    ]
+  };
+
+  var SPRC = {
+    '1': '#12162A', '2': '#2B2119', '3': '#E0AF83',
+    '4': '#2E6BB3', '5': '#2A3350', '6': '#12162A'
+  };
+
+  function drawSprite(rows, x, y, flip, lift) {
+    for (var r = 0; r < rows.length; r++) {
+      var row = rows[r];
+      /* walk cycle: the torso lifts a pixel, the feet stay planted */
+      var yy = y + r - (lift && r < 13 ? 1 : 0);
+      for (var c = 0; c < row.length; c++) {
+        var ch = row.charAt(c);
+        if (ch === '.') continue;
+        var cc = flip ? row.length - 1 - c : c;
+        px(x + cc, yy, 1, 1, SPRC[ch]);
+      }
+    }
+  }
+
+  /* ---------- 5. stations ------------------------------------------- */
+
+  var STATIONS = [
+    { id: 'about',        rect: [8, 8, 11, 9],   label: 'the desk' },
+    { id: 'experience',   rect: [30, 1, 36, 1],  label: 'the filing cabinets' },
+    { id: 'projects',     rect: [17, 1, 24, 1],  label: 'the pinboard' },
+    { id: 'education',    rect: [1, 4, 1, 8],    label: 'the framed diplomas' },
+    { id: 'publications', rect: [2, 1, 8, 1],    label: 'the archive shelf' },
+    { id: 'skills',       rect: [1, 14, 1, 19],  label: 'the rack' },
+    { id: 'gametheory',   rect: [20, 12, 27, 12], label: 'the whiteboard' },
+    { id: 'interests',    rect: [35, 19, 35, 19], label: 'the bench' },
+    { id: 'contact',      rect: [17, 21, 17, 21], label: 'the pigeonhole' },
+    { id: '__exit',       rect: [19, 23, 20, 23], label: 'the door', exit: true }
+  ];
+
+  function distToStation(s, x, y) {
+    var x0 = s.rect[0] * TILE, y0 = s.rect[1] * TILE;
+    var x1 = (s.rect[2] + 1) * TILE, y1 = (s.rect[3] + 1) * TILE;
+    var dx = Math.max(x0 - x, 0, x - x1);
+    var dy = Math.max(y0 - y, 0, y - y1);
+    return Math.sqrt(dx * dx + dy * dy);
+  }
+
+  /* ---------- 6. state ---------------------------------------------- */
+
+  var canvas = document.getElementById('scene');
+  var player = { x: 19.5 * TILE, y: 21.5 * TILE, dir: 'up', moving: false, anim: 0 };
+  var cam = { x: 0, y: 0, scale: 3 };
+  var keys = Object.create(null);
+  var touchDir = null;
+  var near = null;
+  var visited = Object.create(null);
+  var visitedCount = 0;
+  var running = true;
+  var booted = false;
+
+  var elTicker = document.getElementById('ticker');
+  var elFound = document.getElementById('found');
+  var elPanel = document.getElementById('panel');
+
+  document.getElementById('total').textContent = String(STATIONS.length - 1);
+
+  function resize() {
+    var vw = window.innerWidth, vh = window.innerHeight;
+    var s = Math.min(vw / (11 * TILE), vh / (9 * TILE));
+    cam.scale = Math.max(2, Math.min(4, Math.floor(s)));
+    canvas.width = Math.ceil(vw / cam.scale);
+    canvas.height = Math.ceil(vh / cam.scale);
+    ctx = canvas.getContext('2d');
+    ctx.imageSmoothingEnabled = false;
+  }
+  window.addEventListener('resize', resize);
+  resize();
+
+  /* ---------- 7. movement ------------------------------------------- */
+
+  var HW = 4.5, HT = 5;   /* feet hitbox: half-width, height above the anchor */
+
+  function canStand(x, y) {
+    var pts = [[x - HW, y - HT], [x + HW, y - HT], [x - HW, y], [x + HW, y]];
+    for (var i = 0; i < pts.length; i++) {
+      if (blocked(Math.floor(pts[i][0] / TILE), Math.floor(pts[i][1] / TILE))) return false;
+    }
+    return true;
+  }
+
+  function step(dt) {
+    var dx = 0, dy = 0;
+    if (keys.left || touchDir === 'left') dx -= 1;
+    if (keys.right || touchDir === 'right') dx += 1;
+    if (keys.up || touchDir === 'up') dy -= 1;
+    if (keys.down || touchDir === 'down') dy += 1;
+
+    player.moving = !!(dx || dy);
+    if (player.moving) {
+      if (dx && dy) { dx *= 0.7071; dy *= 0.7071; }
+      if (dy < 0) player.dir = 'up';
+      else if (dy > 0) player.dir = 'down';
+      if (dx < 0) player.dir = 'left';
+      else if (dx > 0) player.dir = 'right';
+
+      var sp = 68 * dt;
+      var nx = player.x + dx * sp;
+      if (canStand(nx, player.y)) player.x = nx;
+      var ny = player.y + dy * sp;
+      if (canStand(player.x, ny)) player.y = ny;
+      player.anim += dt * 7.5;
+    } else {
+      player.anim = 0;
+    }
+
+    /* nearest station */
+    var best = null, bestD = 1e9;
+    for (var i = 0; i < STATIONS.length; i++) {
+      var d = distToStation(STATIONS[i], player.x, player.y - 4);
+      if (d < 20 && d < bestD) { best = STATIONS[i]; bestD = d; }
+    }
+    if (best !== near) { near = best; updateTicker(); }
+  }
+
+  /* ---------- 8. draw ----------------------------------------------- */
+
+  function draw(t) {
+    var vw = canvas.width, vh = canvas.height;
+    cam.x = Math.round(player.x - vw / 2);
+    cam.y = Math.round(player.y - vh / 2);
+    cam.x = Math.max(0, Math.min(COLS * TILE - vw, cam.x));
+    cam.y = Math.max(0, Math.min(ROWS * TILE - vh, cam.y));
+    if (COLS * TILE < vw) cam.x = (COLS * TILE - vw) / 2;
+    if (ROWS * TILE < vh) cam.y = (ROWS * TILE - vh) / 2;
+
+    px(0, 0, vw, vh, C.ink);
+    ctx.save();
+    ctx.translate(-cam.x, -cam.y);
+
+    var cx0 = Math.max(0, Math.floor(cam.x / TILE));
+    var cy0 = Math.max(0, Math.floor(cam.y / TILE));
+    var cx1 = Math.min(COLS - 1, Math.ceil((cam.x + vw) / TILE));
+    var cy1 = Math.min(ROWS - 1, Math.ceil((cam.y + vh) / TILE));
+
+    for (var cy = cy0; cy <= cy1; cy++) {
+      for (var cx = cx0; cx <= cx1; cx++) {
+        var ch = tileAt(cx, cy);
+        var x = cx * TILE, y = cy * TILE;
+        if (ON_FLOOR.indexOf(ch) !== -1) {
+          (cy >= 13 && cx >= 34 ? paintStone : paintFloor)(x, y, cx, cy);
+        }
+        (PAINT[ch] || paintFloor)(x, y, cx, cy, t);
+      }
+    }
+
+    /* soft shadow, then the player */
+    ctx.globalAlpha = 0.22;
+    px(Math.round(player.x) - 5, Math.round(player.y) - 2, 10, 3, '#000');
+    ctx.globalAlpha = 1;
+
+    var frame = player.moving ? (Math.floor(player.anim) % 2) : 0;
+    var rows = player.dir === 'up' ? SPR.up : player.dir === 'down' ? SPR.down : SPR.side;
+    drawSprite(rows, Math.round(player.x) - 6, Math.round(player.y) - 16,
+               player.dir === 'left', frame);
+
+    /* marker above whatever you are standing next to */
+    if (near) {
+      var bob = Math.round(Math.sin(t / 260) * 1.5);
+      var mx = Math.round((near.rect[0] + near.rect[2] + 1) / 2 * TILE) - 3;
+      var my = near.rect[1] * TILE - 12 + bob;
+      px(mx, my, 6, 6, visited[near.id] ? C.olive : C.amber);
+      px(mx + 2, my + 1, 2, 3, C.ink);
+      px(mx + 2, my + 5, 2, 1, C.ink);
+    }
+
+    ctx.restore();
+
+    /* vignette so the HUD stays readable */
+    var g = ctx.createLinearGradient(0, 0, 0, vh);
+    g.addColorStop(0, 'rgba(10,12,22,.55)');
+    g.addColorStop(0.25, 'rgba(10,12,22,0)');
+    g.addColorStop(1, 'rgba(10,12,22,.35)');
+    ctx.fillStyle = g;
+    ctx.fillRect(0, 0, vw, vh);
+  }
+
+  var last = 0;
+  function loop(t) {
+    if (!last) last = t;
+    var dt = Math.min((t - last) / 1000, 0.05);
+    last = t;
+    if (running) { step(dt); draw(t); }
+    requestAnimationFrame(loop);
+  }
+  requestAnimationFrame(loop);
+
+  /* ---------- 9. ticker --------------------------------------------- */
+
+  var isTouch = window.matchMedia('(hover:none)').matches;
+  if (isTouch) document.body.classList.add('touch');
+
+  function updateTicker() {
+    if (!booted) return;
+    if (near) {
+      elTicker.innerHTML = 'You are standing at ' + near.label + '. ' +
+        (isTouch ? 'Tap <kbd>OPEN</kbd>' : 'Press <kbd>E</kbd>') +
+        (near.exit ? ' to leave and read the CV.' : ' to look.');
+    } else if (visitedCount >= STATIONS.length - 1) {
+      elTicker.innerHTML = 'That is all of it. The door is at the bottom of the floor.';
+    } else {
+      elTicker.innerHTML = isTouch
+        ? 'Walk with the pad. ' + (STATIONS.length - 1 - visitedCount) + ' things left to find.'
+        : 'Walk with <kbd>WASD</kbd> or the arrow keys. ' +
+          (STATIONS.length - 1 - visitedCount) + ' things left to find.';
+    }
+  }
+
+  function boot() {
+    var line = 'third floor · nine things to find';
+    var i = 0;
+    if (window.matchMedia('(prefers-reduced-motion:reduce)').matches) {
+      booted = true; updateTicker(); return;
+    }
+    (function type() {
+      elTicker.textContent = line.slice(0, ++i);
+      if (i < line.length) setTimeout(type, 26);
+      else setTimeout(function () { booted = true; updateTicker(); }, 700);
+    })();
+  }
+  boot();
+
+  /* ---------- 10. panel --------------------------------------------- */
+
+  function stripIds(node) {
+    var all = node.querySelectorAll('[id]');
+    for (var i = 0; i < all.length; i++) all[i].removeAttribute('id');
+    return node;
+  }
+
+  function openStation(s) {
+    if (s.exit) { setMode('doc'); return; }
+    var sec = document.getElementById(s.id);
+    if (!sec) return;
+
+    var body = document.getElementById('panel-body');
+    body.textContent = '';
+    var kids = sec.children;
+    for (var i = 0; i < kids.length; i++) {
+      if (kids[i].tagName === 'H2') continue;
+      body.appendChild(stripIds(kids[i].cloneNode(true)));
+    }
+
+    document.getElementById('panel-eyebrow').textContent = sec.dataset.eyebrow || '';
+    document.getElementById('panel-title').textContent = sec.dataset.station || s.id;
+    document.getElementById('panel-foot').textContent = sec.dataset.foot || '';
+    hydrate(body);
+
+    elPanel.setAttribute('open', '');
+    elPanel.querySelector('.panel__sheet').scrollTop = 0;
+    elPanel.querySelector('[data-close]').focus();
+    running = false;
+
+    if (!visited[s.id]) {
+      visited[s.id] = true;
+      visitedCount++;
+      elFound.textContent = String(visitedCount);
+      if (visitedCount === STATIONS.length - 1) {
+        document.getElementById('panel-foot').textContent =
+          'That is the whole floor. Thank you for walking it.';
+      }
+    }
+  }
+
+  function closePanel() {
+    if (!elPanel.hasAttribute('open')) return;
+    elPanel.removeAttribute('open');
+    running = true;
+    last = 0;
+    updateTicker();
+    canvas.focus();
+  }
+
+  elPanel.addEventListener('click', function (e) {
+    if (e.target === elPanel || e.target.hasAttribute('data-close')) closePanel();
+  });
+
+  /* ---------- 11. input --------------------------------------------- */
+
+  var KEYMAP = {
+    ArrowUp: 'up', KeyW: 'up', ArrowDown: 'down', KeyS: 'down',
+    ArrowLeft: 'left', KeyA: 'left', ArrowRight: 'right', KeyD: 'right'
+  };
+
+  window.addEventListener('keydown', function (e) {
+    if (e.code === 'Escape') { closePanel(); return; }
+    if (document.body.classList.contains('mode-doc')) return;
+    if (elPanel.hasAttribute('open')) return;
+    var k = KEYMAP[e.code];
+    if (k) { keys[k] = true; e.preventDefault(); }
+    if (e.code === 'KeyE' || e.code === 'Enter' || e.code === 'Space') {
+      if (near) { openStation(near); e.preventDefault(); }
+    }
+  });
+  window.addEventListener('keyup', function (e) {
+    var k = KEYMAP[e.code];
+    if (k) keys[k] = false;
+  });
+  window.addEventListener('blur', function () { keys = Object.create(null); touchDir = null; });
+
+  var padBtns = document.querySelectorAll('[data-move]');
+  Array.prototype.forEach.call(padBtns, function (b) {
+    var d = b.getAttribute('data-move');
+    var on = function (e) { e.preventDefault(); touchDir = d; };
+    var off = function () { if (touchDir === d) touchDir = null; };
+    b.addEventListener('touchstart', on, { passive: false });
+    b.addEventListener('touchend', off);
+    b.addEventListener('touchcancel', off);
+    b.addEventListener('mousedown', on);
+    b.addEventListener('mouseup', off);
+    b.addEventListener('mouseleave', off);
+  });
+  document.querySelector('[data-act]').addEventListener('click', function () {
+    if (near) openStation(near);
+  });
+
+  /* walking with a tap: head towards where you touched the floor */
+  canvas.addEventListener('pointerdown', function (e) {
+    if (elPanel.hasAttribute('open')) return;
+    var r = canvas.getBoundingClientRect();
+    var wx = (e.clientX - r.left) / r.width * canvas.width + cam.x;
+    var wy = (e.clientY - r.top) / r.height * canvas.height + cam.y;
+    for (var i = 0; i < STATIONS.length; i++) {
+      if (distToStation(STATIONS[i], wx, wy) < 14) {
+        if (distToStation(STATIONS[i], player.x, player.y - 4) < 20) openStation(STATIONS[i]);
+        return;
+      }
+    }
+  });
+
+  /* ---------- 12. modes --------------------------------------------- */
+
+  function setMode(mode) {
+    document.body.classList.toggle('mode-doc', mode === 'doc');
+    document.body.classList.toggle('mode-game', mode !== 'doc');
+    running = mode !== 'doc';
+    last = 0;
+    if (mode === 'doc') closePanel();
+    else window.scrollTo(0, 0);
+  }
+
+  Array.prototype.forEach.call(document.querySelectorAll('[data-doc]'), function (b) {
+    b.addEventListener('click', function (e) {
+      e.preventDefault();
+      setMode('doc');
+      location.hash = '#about';
+    });
+  });
+  document.querySelector('[data-game]').addEventListener('click', function () {
+    history.replaceState(null, '', location.pathname);
+    setMode('game');
+  });
+
+  /* deep links open the document, not the game */
+  if (location.hash && document.querySelector(location.hash)) {
+    setMode('doc');
+    var target = document.querySelector(location.hash);
+    if (target) setTimeout(function () { target.scrollIntoView(); }, 0);
+  }
+
+  /* ---------- 13. email, kept away from scrapers --------------------- */
+
+  var MAILBITS = ['dim', '.', 'pantazatos', '@', 'gmail', '.', 'com'];
+  var TELBITS = ['+30', ' 6955', ' 391', ' 934'];
+
+  function hydrate(root) {
+    var mails = root.querySelectorAll('[data-mail]');
+    Array.prototype.forEach.call(mails, function (a) {
+      var addr = MAILBITS.join('');
+      a.setAttribute('href', 'mailto:' + addr);
+      var slot = a.querySelector('[data-mail-text]');
+      if (slot) slot.textContent = addr;
+    });
+    var tels = root.querySelectorAll('[data-tel]');
+    Array.prototype.forEach.call(tels, function (a) {
+      var num = TELBITS.join('');
+      a.setAttribute('href', 'tel:' + num.replace(/\s/g, ''));
+      var slot = a.querySelector('[data-tel-text]');
+      if (slot) slot.textContent = num;
+    });
+    var gt = root.querySelector('[data-gt]');
+    if (gt) mountGame(gt);
+    var imgs = root.querySelectorAll('img');
+    Array.prototype.forEach.call(imgs, function (im) {
+      im.addEventListener('error', function () { im.style.display = 'none'; });
+    });
+  }
+
+  /* ---------- 14. the whiteboard: a repeated prisoner's dilemma ------ */
+
+  var PAYOFF = {          /* [you, them] */
+    CC: [3, 3], CD: [0, 5], DC: [5, 0], DD: [1, 1]
+  };
+
+  function mountGame(mount) {
+    var rounds = 5, n = 0, mine = 0, theirs = 0, lastMine = null;
+    mount.textContent = '';
+
+    var wrap = document.createElement('div');
+    wrap.className = 'gt';
+    wrap.innerHTML =
+      '<table class="gt__matrix"><tbody>' +
+      '<tr><th></th><th>They stay quiet</th><th>They talk</th></tr>' +
+      '<tr><th>You stay quiet</th><td data-cell="CC">3 / 3</td><td data-cell="CD">0 / 5</td></tr>' +
+      '<tr><th>You talk</th><td data-cell="DC">5 / 0</td><td data-cell="DD">1 / 1</td></tr>' +
+      '</tbody></table>' +
+      '<div class="gt__choices">' +
+      '<button class="btn" type="button" data-play="C">Stay quiet</button>' +
+      '<button class="btn" type="button" data-play="D">Talk</button>' +
+      '<button class="btn btn--ghost" type="button" data-reset style="color:#141726;border-color:#141726">Reset</button>' +
+      '</div>' +
+      '<div class="gt__log" data-log>Five rounds against a player who opens by trusting you, then copies your last move. Pick one.</div>' +
+      '<p class="gt__score"><span>You <b data-me>0</b></span><span>Them <b data-them>0</b></span><span>Round <b data-round>1</b> / 5</span></p>';
+    mount.appendChild(wrap);
+
+    var log = wrap.querySelector('[data-log]');
+    var elMe = wrap.querySelector('[data-me]');
+    var elThem = wrap.querySelector('[data-them]');
+    var elRound = wrap.querySelector('[data-round]');
+
+    function say(html) {
+      var p = document.createElement('p');
+      p.style.margin = '0 0 .4rem';
+      p.innerHTML = html;
+      log.appendChild(p);
+      log.scrollTop = log.scrollHeight;
+    }
+    function highlight(key) {
+      Array.prototype.forEach.call(wrap.querySelectorAll('[data-cell]'), function (td) {
+        td.classList.toggle('hot', td.getAttribute('data-cell') === key);
+      });
+    }
+    function play(me) {
+      if (n >= rounds) return;
+      var them = lastMine === null ? 'C' : lastMine;   /* tit for tat */
+      lastMine = me;
+      var key = me + them;
+      var pay = PAYOFF[key];
+      mine += pay[0]; theirs += pay[1]; n++;
+      highlight(key);
+      elMe.textContent = mine;
+      elThem.textContent = theirs;
+      elRound.textContent = Math.min(n + 1, rounds);
+      say('<b>Round ' + n + '.</b> You ' + (me === 'C' ? 'stayed quiet' : 'talked') +
+          ', they ' + (them === 'C' ? 'stayed quiet' : 'talked') +
+          ' — ' + pay[0] + ' to you, ' + pay[1] + ' to them.');
+      if (n === rounds) {
+        elRound.textContent = rounds;
+        if (mine > theirs) say('<b>You finished ahead.</b> Against a copycat that costs something: you had to defect last, and every defection came back to you a round later.');
+        else if (mine < theirs) say('<b>They finished ahead.</b> You defected into a player who remembers.');
+        else say('<b>A draw.</b> Mutual quiet pays 15 over five rounds — more than either of you can reach by betrayal.');
+        say('That gap between the individually rational move and the jointly better one is the whole subject. It was the starting point of my MSc thesis on game theory in economics and negotiation.');
+      }
+    }
+    wrap.addEventListener('click', function (e) {
+      var b = e.target.closest ? e.target.closest('button') : null;
+      if (!b) return;
+      if (b.hasAttribute('data-play')) play(b.getAttribute('data-play'));
+      if (b.hasAttribute('data-reset')) mountGame(mount);
+    });
+  }
+
+  hydrate(document.getElementById('doc'));
+})();
+</script>
+</body>
+</html>
